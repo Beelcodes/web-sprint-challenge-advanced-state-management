@@ -1,31 +1,52 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
 
-import AddForm from "./components/AddForm";
-import SmurfList from "./components/SmurfList";
-import Header from "./components/Header";
+import AddForm from './components/AddForm';
+import SmurfList from './components/SmurfList';
+import Header from './components/Header';
 
-import "bootstrap/dist/css/bootstrap.min.css";
+import { fetchSmurfs } from "./actions";
+
+import 'bootstrap/dist/css/bootstrap.min.css';
 import "./App.css";
 
-import { fetchSmurfs } from "./actions/index.js";
+// import mapStateToProps from "react-redux/lib/connect/mapStateToProps";
 
-class App extends Component {
-  render() {
+const App = (props)=> {
+ 
+  const { isLoading, error, fetchSmurfs } = props;
+
+  useEffect(() => {
     fetchSmurfs();
-    return (
-      <div className="App">
-        <Header />
+  }, [fetchSmurfs])
 
-        <main>
-          <SmurfList />
-          <AddForm />
-        </main>
-      </div>
-    );
+  if (error) {
+    return <h2> No smurfs for you! {error}</h2>
   }
+
+  if (isLoading) {
+    return <h2> Loading... </h2>
+  }
+
+  return (
+    <div className="App">
+      <Header />
+      <main>
+        <SmurfList/>
+        <AddForm/>
+      </main>
+    </div>
+  );
 }
 
-export default App;
+const mapToStateProps = (state) => {
+  return ({
+    isLoading: state.isLoading,
+    error: state.error
+  })
+}
+
+export default connect(mapToStateProps, { fetchSmurfs })(App);
 
 //Task List:
 //1. Connect the fetchSmurfs actions to the App component.
